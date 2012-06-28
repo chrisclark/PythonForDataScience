@@ -1,0 +1,4 @@
+.project
+.pydevproject
+Data/submission.csv
+*.pyc

@@ -1,26 +1,20 @@
 from sklearn.ensemble import RandomForestClassifier
-import csv
+from numpy import genfromtxt, savetxt
 
 def main():
-    #read in the training and test data
-    train = csv.reader(open("Data/train.csv", "rb"))
-    #the first column of the training set will be the target for the random forest classifier
-    target = [x[0] for x in train]
-    train = [x[1:] for x in train]
-    test = csv.read_csv("Data/test.csv")
-
+    #create the training & test sets, skipping the header row with [1:]
+    dataset = genfromtxt(open('Data/train.csv','r'), delimiter=',', dtype='f8')[1:]    
+    target = [x[0] for x in dataset]
+    train = [x[1:] for x in dataset]
+    test = genfromtxt(open('Data/test.csv','r'), delimiter=',', dtype='f8')[1:]
+    
     #create and train the random forest
-    #if you have a multi-core CPU you can train the model in parallel
-    #by changing the below line to:
-    #rf = RandomForestClassifier(n_estimators=100, n_jobs=2)
+    #multi-core CPUs can use: rf = RandomForestClassifier(n_estimators=100, n_jobs=2)
     rf = RandomForestClassifier(n_estimators=100)
     rf.fit(train, target)
-    predicted_probs = rf.predict_proba(test)
-    predicted_probs = [["%f" % x[1]] for x in predicted_probs]
+    predicted_probs = [x[1] for x in rf.predict_proba(test)]
 
-    #write to a results CSV file
-    myWriter = csv.writer(open("Data/my_first_submission.csv"))
-	myWriter.writerows[predicted_probs]
+    savetxt('Data/submission.csv', predicted_probs, delimiter=',', fmt='%f')
 
 if __name__=="__main__":
     main()
